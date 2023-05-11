@@ -1,0 +1,71 @@
+import pandas as pd
+import numpy as np
+import datetime as dt
+import matplotlib.pyplot as plt
+import time
+
+class TradingBook:
+    def __init__(self, positions, market_prices):
+        self.positions = positions
+        self.market_prices = market_prices
+
+class RiskManagementSystem:
+    def __init__(self, trading_book, risk_threshold):
+        self.trading_book = trading_book
+        self.risk_threshold = risk_threshold
+        self.current_risk = 0
+        self.prev_risk = 0
+        self.alert_sent = False
+        self.risk_history = []
+
+    def calculate_risk(self):
+        # calculate current risk exposure of trading book
+        self.current_risk = self.trading_book.positions * self.trading_book.market_prices
+        self.current_risk = self.current_risk.sum()
+
+    def check_risk_threshold(self):
+        # check if current risk exceeds threshold
+        if self.current_risk > self.risk_threshold:
+            self.alert_sent = True
+            print("Risk threshold exceeded at", dt.datetime.now())
+            # send an alert to the trading desk or risk management team
+
+    def monitor_risk(self):
+        for i in range(10): # monitor for 10 intervals
+            # randomly adjust positions
+            self.trading_book.positions += np.random.randint(-10, 10, len(self.trading_book.positions))
+            self.calculate_risk()
+            print("Current risk exposure:", self.current_risk)
+            self.check_risk_threshold()
+            if self.current_risk > self.prev_risk:
+                # if risk exposure is increasing, take action (e.g. adjust positions)
+                print("Risk exposure increasing at", dt.datetime.now())
+            self.prev_risk = self.current_risk
+            self.risk_history.append(self.current_risk)
+            # wait for a specified time interval (e.g. 1 second) before checking risk again
+            time.sleep(1)
+    def plot_risk_history(self):
+        fig, ax = plt.subplots()
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Risk Exposure")
+        ax.set_title("Risk Exposure over Time")
+        ax.plot(self.risk_history, marker='o')
+        plt.show()
+
+if __name__ == '__main__':
+    # define input: trading book positions and market prices
+    positions = pd.Series([100, 50, -75, 200])
+    market_prices = pd.Series([10, 20, 30, 40])
+    trading_book = TradingBook(positions, market_prices)
+
+    # define input: risk threshold
+    risk_threshold = 10000
+
+    # create risk management system
+    rms = RiskManagementSystem(trading_book, risk_threshold)
+
+    # start monitoring risk exposure
+    rms.monitor_risk()
+
+    # visualize risk exposure over time
+    rms.plot_risk_history()
